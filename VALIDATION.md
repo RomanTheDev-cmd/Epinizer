@@ -1,3 +1,83 @@
+# Epinizer 2.1.0 — 2026-10-24 (Codex) Validation
+
+## Scope and evidence
+
+2026-10-24 polish: permanent outlines removed from buttons and percentage fields;
+soft dial shadows retained. Fresh universal macOS and Windows builds passed;
+universal CTest 4/4 and Wine state/direct-editor checks passed. The new actual JUCE
+snapshot and a second scoped static finish review found no blocking clipping/overlap.
+Interactive keyboard and DAW use remain untested.
+
+MyDarknessDays branding, original castle interface and wet Width. The larger
+combined-effect sound specification remains unimplemented. PowerKick and PowerBass
+were read only as references; no project files were changed or built there.
+
+- Native arm64 CTest: 4/4 passed; universal build CTest: 4/4 passed.
+- Universal AU contains arm64 + x86_64. Rosetta DSP and state checks passed.
+- Width values 0 / 0.37 / 1 tested in all four characters against independent
+  wet mid/side expectations at quiet levels; dry and bypass remain unchanged.
+- Saved pre-redesign DSP compared with Width=100%: sample-for-sample equality
+  for four character renders. This is a bounded numerical comparison, not listening.
+- Width state round trip, migration from schema 1 and 3, five slider attachments,
+  character/preset/button callbacks and bounds of visible controls passed.
+- Actual native JUCE PNG at 2x visually inspected. Independent static finish review
+  found no blocking overlap/clipping. This is not an interactive DAW GUI test.
+- Developer verified in AU Info.plist and VST3 moduleinfo as MyDarknessDays.
+  Existing Epna/Epnz and audio.epinizer.effect identifiers are retained.
+- User AU installed with the previous user bundle backed up. Installed executable
+  SHA-256 is checked against the signed package, not the bare iCloud build folder. No PowerKick/PowerBass installation changed.
+- Apple auval strict passed arm64 and Rosetta **for version 2.1.0**, vendor
+  MyDarknessDays. Initial runs still loaded cached 2.0 and are separately archived;
+  only the subsequent explicitly identified 2.1 runs count for this release.
+- Windows PE x64 built with clang-cl 23.1.4/MSVC ABI and static runtime.
+  Wine: DSP, character/Hold, realtime allocations, state/direct editor and actual
+  VST3 discover/load/render/state (`--no-editor`) passed; manifest emitted correctly.
+  The path-sensitive host test passed with an ASCII Wine drive alias. Its initial
+  raw Unicode argv path failed discovery; that failure is retained in the logs.
+- Windows RC build initially failed on escaped Cyrillic line markers. Resource
+  preprocessing now explicitly uses C without line markers and avoids a second pass;
+  a focused resource check and the complete Windows build then passed.
+
+## Known limitations
+
+Wine raster snapshot timed out after 60 seconds; Windows visual/hosted GUI validation
+is not claimed. No native Windows DAW, installer/UAC, physical Intel Mac, other macOS
+version, interactive Logic editing, keyboard/screen-reader or musical listening test
+was performed. The new larger DSP architecture is still a proposal.
+
+Mac packaging initially failed signing the live iCloud build because FinderInfo/file-provider
+attributes were attached to the bundle. Packaging now copies without metadata into
+a clean staging directory and signs/verifies that copy. The user installer also copies
+without metadata. The original cloud metadata is not removed from the workspace.
+
+The common JUCE code still emits macOS SDK deprecation warnings. No JUCE source was
+patched. Ad-hoc AU signing only: no Developer ID, notarization or signed installer.
+System PKG installation remains untested; the user-level ZIP route was exercised.
+The original pkgbuild ownership mapping emitted four `write: Permission denied`
+diagnostics, also reproduced with a one-file payload outside iCloud. Packaging now
+uses `--ownership preserve`, then explicitly writes root:wheel archive/BOM ownership
+before flattening. Stderr is not filtered. The new packaging run has none of those
+diagnostics. Two packaging regressions passed: a complete decompressed payload and
+BOM comparison with Apple's recommended-ownership reference (including executable
+modes, nested directories and spaces), and rejection of invalid/truncated payloads.
+Only the current gzip/odc pkgbuild format is supported; an unexpected format or BOM
+round-trip mismatch aborts packaging. This does not prove successful global installation.
+The old system-wide 1.0 AU remains installed; choose
+MyDarknessDays / Epinizer to use the updated user-level plugin.
+
+The background was generated from text without a reference image; controls/layout are
+implemented for Epinizer, system fonts are not bundled. Provenance is Assets/README.md.
+No legal clearance or guarantee of universal non-infringement/trademark availability
+was performed; existing JUCE/dependency licence obligations remain.
+
+Raw logs and exit codes: `dist/validation-ui-20261024/`. Rendered design evidence:
+`Дизайн/2026-10-24/`. Documentation-only changes after the compiled checks do not
+change the tested binaries. Package integrity/hash checks are recorded separately.
+
+---
+
+## Historical 2.0 results (not a fresh check of 2.1)
+
 # Epinizer 2.0.0 — validation 2026-10-12
 
 Host: macOS 27.0.1, Apple Silicon, AppleClang 21, CMake 4.4.4, pinned JUCE 8.0.12.

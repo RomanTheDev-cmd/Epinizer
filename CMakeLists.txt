@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(Epinizer VERSION 2.0.0 LANGUAGES C CXX)
+project(Epinizer VERSION 2.1.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(APPLE)
@@ -28,7 +28,7 @@ else()
   set(EPINIZER_AUTO_MANIFEST TRUE)
 endif()
 juce_add_plugin(Epinizer
-  COMPANY_NAME "Epinizer Audio" BUNDLE_ID "audio.epinizer.effect"
+  COMPANY_NAME "MyDarknessDays" BUNDLE_ID "audio.epinizer.effect"
   PLUGIN_MANUFACTURER_CODE Epna PLUGIN_CODE Epnz
   FORMATS ${EPINIZER_FORMAT} PRODUCT_NAME "Epinizer"
   IS_SYNTH FALSE NEEDS_MIDI_INPUT FALSE NEEDS_MIDI_OUTPUT FALSE
@@ -38,8 +38,9 @@ juce_add_plugin(Epinizer
   AU_SANDBOX_SAFE TRUE
   AU_MAIN_TYPE kAudioUnitType_Effect)
 target_sources(Epinizer PRIVATE Source/PluginProcessor.cpp Source/PluginEditor.cpp)
+juce_add_binary_data(EpinizerAssets SOURCES Assets/castle-entrance.png)
 target_compile_definitions(Epinizer PUBLIC JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
-target_link_libraries(Epinizer PRIVATE juce::juce_audio_utils PUBLIC juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
+target_link_libraries(Epinizer PRIVATE EpinizerAssets juce::juce_audio_utils PUBLIC juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
 juce_add_console_app(epinizer_plugin_tests PRODUCT_NAME "Epinizer integration tests")
 # Shared plugin code exports JUCE_STANDALONE_APPLICATION=0; avoid a conflicting console definition.
 get_target_property(EPINIZER_TEST_DEFS epinizer_plugin_tests COMPILE_DEFINITIONS)

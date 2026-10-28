@@ -9,6 +9,7 @@ struct Settings {
     float space=.48f, density=.58f, motion=.4f, mix=.55f;
     int character=0;
     bool bypass=false, echo=true, hold=false;
+    float width=1.f;
 };
 
 // All storage is allocated in prepare(). Each sample follows the same path,
@@ -57,7 +58,7 @@ class Engine {
     float attackCoefficient=0,releaseCoefficient=0,slowCoefficient=0;
     float envelope=0,slowEnvelope=0,duck=1,bypassGain=1,echoGain=1,holdGain=0;
     float densityDrive=1,damping=0,feedback=0,detuneDepth=0;
-    float outputGain=1;
+    float outputGain=1,widthGain=1;
     size_t controlCounter=0,freezeStart=0,freezeRead=0,freezeSpan=0,freezeFade=0;
     bool wasHolding=false;
     double reversePhase=0,ringPhase=0;
@@ -140,6 +141,7 @@ public:
         macro={unit(s.space),unit(s.density),unit(s.motion),unit(s.mix)};
         colour.fill(0);colour[size_t(std::clamp(s.character,0,3))]=1;
         bypassGain=s.bypass?0.f:1.f;echoGain=s.echo?1.f:0.f;
+        widthGain=unit(s.width);
         // A restored Hold starts from silence until audio has actually been captured.
         updateControls();
     }
@@ -150,6 +152,7 @@ public:
             for(size_t k=0;k<4;++k){macro[k]+=smooth*(targets[k]-macro[k]);colour[k]+=colourSmooth*((int(k)==character?1.f:0.f)-colour[k]);}
             bypassGain+=smooth*((s.bypass?0.f:1.f)-bypassGain);
             echoGain+=smooth*((s.echo?1.f:0.f)-echoGain);
+            widthGain+=smooth*(unit(s.width)-widthGain);
             if((controlCounter++&31u)==0)updateControls();
             const float space=macro[0],density=macro[1],motion=macro[2];
             const float glass=colour[0],massive=colour[1],horror=colour[2],warm=colour[3];
@@ -239,6 +242,12 @@ public:
                 wet[c]+=holdGain*(cloud-wet[c]);
             }
             if(++freezeRead==freezeSpan+freezeFade)freezeRead=freezeFade;
+            // Narrow the wet image only; unity preserves the previous stereo sound exactly.
+            if(right&&widthGain!=1.f) {
+                const float midWet=(wet[0]+wet[1])*.5f;
+                wet[0]=midWet+widthGain*(wet[0]-midWet);
+                wet[1]=midWet+widthGain*(wet[1]-midWet);
+            }
             float mixed[2]{dry[0]+macro[3]*(wet[0]-dry[0]),dry[1]+macro[3]*(wet[1]-dry[1])};
             const float peak=std::max(std::abs(mixed[0]),std::abs(mixed[1]));
             const float desiredGain=peak>.94f?.94f/peak:1.f;

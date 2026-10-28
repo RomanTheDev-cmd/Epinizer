@@ -1,3 +1,12 @@
+# Windows build note — 2026-10-24 (Codex)
+
+Current cross-build directory: `build-windows-design`; package version 2.1.0.
+The resource compile rule explicitly uses C preprocessing without line markers and
+then `/no-preprocess` for llvm-rc. This avoids C++ `extern` fragments and octal
+non-ASCII path markers being parsed a second time on the iCloud project path.
+Current local toolchain: clang-cl 23.1.4 from LLVM-MinGW 20261020, used in MSVC mode.
+Previous build notes below describe historical versions and are not current validation.
+
 # Windows VST3: build and validate
 
 ## Recommended: on Windows

@@ -3,7 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 SOURCE="$PWD/Epinizer.component"
 if [[ ! -d "$SOURCE" ]]; then
-  SOURCE="$PWD/../build/Epinizer_artefacts/Release/AU/Epinizer.component"
+  SOURCE="$PWD/../build-macos/Epinizer_artefacts/Release/AU/Epinizer.component"
 fi
 [[ -d "$SOURCE" ]] || { echo 'Epinizer.component not found. Build the AU first.'; exit 1; }
 DEST="$HOME/Library/Audio/Plug-Ins/Components"
@@ -13,5 +13,5 @@ if [[ -e "$DEST/Epinizer.component" ]]; then
   mkdir -p "$BACKUP"
   mv "$DEST/Epinizer.component" "$BACKUP/"
 fi
-/usr/bin/ditto "$SOURCE" "$DEST/Epinizer.component"
+/usr/bin/ditto --norsrc --noextattr "$SOURCE" "$DEST/Epinizer.component"
 echo 'Epinizer AU installed. Restart your DAW and rescan Audio Units if needed.'

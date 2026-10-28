@@ -13,11 +13,15 @@ commercial JUCE licence. The project has not been publicly distributed.
 JUCE embeds additional dependencies with their own notices (including the
 AudioUnitSDK and VST3 SDK). Preserve JUCE's LICENSE.md and referenced notices
 when distributing corresponding sources. Full notices are in third_party/JUCE.
-No third-party image, font or audio assets are used; the UI is drawn in code.
+The castle background is generated for Epinizer from text; provenance and the exact
+prompt are recorded in Assets/README.md. No stock photograph, external logo,
+PowerBass/PowerKick artwork or bundled font is used. The UI controls are drawn
+in code and use system fonts. Generation does not guarantee universal clearance.
 
 Windows cross-build tools (not installed globally or included as tools in the ZIP):
-- LLVM 22.1.8 from LLVM-MinGW 20260616, used in **MSVC mode**, not MinGW ABI.
-  https://github.com/mstorsjo/llvm-mingw/releases/tag/20260616
+- Current visual release: LLVM 23.1.4 from LLVM-MinGW 20261020, used in **MSVC mode**,
+  not MinGW ABI. https://github.com/mstorsjo/llvm-mingw/releases/tag/20261020
+  The earlier 2.0 build used LLVM 22.1.8 from LLVM-MinGW 20260616.
 - xwin 0.10.0, fetching Microsoft CRT 14.44 and Windows SDK 10.0.26100.
   Microsoft CRT is statically linked; system Windows DLLs remain system imports.
   SDK/CRT headers and libraries are not included in the source archive; rebuilds

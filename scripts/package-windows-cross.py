@@ -6,8 +6,8 @@ import re
 import tempfile
 import zipfile
 root = Path(__file__).resolve().parent.parent
-build = root / 'build-windows-v2-msvc'
-out = root / 'dist' / 'Epinizer-2.0.0-Windows-x64.zip'
+build = root / 'build-windows-design'
+out = root / 'dist' / 'Epinizer-2.1.0-Windows-x64.zip'
 plugin = build / 'Epinizer_artefacts/Release/VST3/Epinizer.vst3'
 if not plugin.is_dir():
     raise SystemExit('Build the Windows VST3 first')
@@ -24,6 +24,9 @@ with tempfile.TemporaryDirectory(prefix='epinizer-windows-package-') as tmp:
         shutil.copy2(root / 'scripts' / name, stage / name)
     for name in ['README.md', 'THIRD_PARTY.md', 'VALIDATION.md', 'CHANGELOG.md']:
         shutil.copy2(root / name, stage / name)
+    shutil.copy2(root / 'План следующей версии.md', stage)
+    (stage / 'Assets').mkdir()
+    shutil.copy2(root / 'Assets/README.md', stage / 'Assets')
     checks = stage / 'validation'
     checks.mkdir()
     shutil.copy2(build / 'epinizer_dsp_tests.exe', checks)

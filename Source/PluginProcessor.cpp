@@ -17,13 +17,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout EpinizerProcessor::layout() 
     p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"bypass",1},"Bypass",false));
     p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"echo",1},"Echo",true));
     p.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"hold",1},"Hold",false));
+    p.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"width",1},"Width",juce::NormalisableRange<float>{0,1,.001f},1.f,
+        juce::AudioParameterFloatAttributes().withLabel("%").withStringFromValueFunction([](float v,int){return juce::String(juce::roundToInt(v*100));}).withValueFromStringFunction([](const juce::String& v){return v.getFloatValue()*.01f;})));
     return p;
 }
 EpinizerProcessor::EpinizerProcessor():AudioProcessor(BusesProperties().withInput("Input",juce::AudioChannelSet::stereo(),true).withOutput("Output",juce::AudioChannelSet::stereo(),true)),state(*this,nullptr,"EpinizerState",layout()) {
-    const char* ids[]{"space","density","motion","mix","character","bypass","echo","hold"};
+    const char* ids[]{"space","density","motion","mix","character","bypass","echo","hold","width"};
     for(size_t i=0;i<values.size();++i) values[i]=state.getRawParameterValue(ids[i]);
 }
-epinizer::Settings EpinizerProcessor::settings() const {return {values[0]->load(),values[1]->load(),values[2]->load(),values[3]->load(),int(values[4]->load()),values[5]->load()>.5f,values[6]->load()>.5f,values[7]->load()>.5f};}
+epinizer::Settings EpinizerProcessor::settings() const {return {values[0]->load(),values[1]->load(),values[2]->load(),values[3]->load(),int(values[4]->load()),values[5]->load()>.5f,values[6]->load()>.5f,values[7]->load()>.5f,values[8]->load()};}
 void EpinizerProcessor::prepareToPlay(double sr,int) {engine.prepare(sr);engine.snap(settings());meter.store(0);}
 bool EpinizerProcessor::isBusesLayoutSupported(const BusesLayout& b) const {return b.getMainInputChannelSet()==b.getMainOutputChannelSet()&&(b.getMainOutputChannelSet()==juce::AudioChannelSet::mono()||b.getMainOutputChannelSet()==juce::AudioChannelSet::stereo());}
 void EpinizerProcessor::render(juce::AudioBuffer<float>& b,bool bypass) {
@@ -43,7 +45,7 @@ void EpinizerProcessor::setCurrentProgram(int i) {
     const char* ids[]{"space","density","motion","mix","character","echo","hold"};const float v[]{p.space,p.density,p.motion,p.mix,float(p.character),1.f,0.f};
     for(int k=0;k<7;++k){auto* param=state.getParameter(ids[k]);param->beginChangeGesture();param->setValueNotifyingHost(param->convertTo0to1(v[k]));param->endChangeGesture();}
 }
-void EpinizerProcessor::getStateInformation(juce::MemoryBlock& b) {auto tree=state.copyState();tree.setProperty("program",program.load(),nullptr);tree.setProperty("version",3,nullptr);if(auto xml=tree.createXml())copyXmlToBinary(*xml,b);}
+void EpinizerProcessor::getStateInformation(juce::MemoryBlock& b) {auto tree=state.copyState();tree.setProperty("program",program.load(),nullptr);tree.setProperty("version",4,nullptr);if(auto xml=tree.createXml())copyXmlToBinary(*xml,b);}
 void EpinizerProcessor::setStateInformation(const void* d,int size) {
     if(auto xml=getXmlFromBinary(d,size))if(xml->hasTagName(state.state.getType())) {
         auto tree=juce::ValueTree::fromXml(*xml);
@@ -51,6 +53,7 @@ void EpinizerProcessor::setStateInformation(const void* d,int size) {
             juce::ValueTree legacyEcho("PARAM");legacyEcho.setProperty("id","echo",nullptr);legacyEcho.setProperty("value",0.f,nullptr);tree.addChild(legacyEcho,-1,nullptr);
         }
         if(!tree.getChildWithProperty("id","hold").isValid()){juce::ValueTree oldHold("PARAM");oldHold.setProperty("id","hold",nullptr);oldHold.setProperty("value",0.f,nullptr);tree.addChild(oldHold,-1,nullptr);}
+        if(!tree.getChildWithProperty("id","width").isValid()){juce::ValueTree oldWidth("PARAM");oldWidth.setProperty("id","width",nullptr);oldWidth.setProperty("value",1.f,nullptr);tree.addChild(oldWidth,-1,nullptr);}
         // Validate saved parameter values before allowing them onto the audio thread.
         for(auto child:tree)if(child.hasProperty("value")) {
             const auto id=child["id"].toString();auto* param=state.getParameter(id);

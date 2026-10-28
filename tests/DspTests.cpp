@@ -6,6 +6,27 @@
 void check(bool b,const char* message){if(!b){std::cerr<<"FAIL: "<<message<<'\n';std::exit(1);}}
 int main(){
     const auto start=std::chrono::steady_clock::now();
+    for(int character=0;character<4;++character) {
+        epinizer::Settings s{.6f,.6f,.4f,1.f,character,false,true,false};
+        const int size=16384;std::vector<float> sourceL(size),sourceR(size);
+        for(int i=0;i<size;++i){sourceL[size_t(i)]=.04f*std::sin(float(i)*.057f);sourceR[size_t(i)]=.03f*std::cos(float(i)*.043f);}
+        auto fullL=sourceL,fullR=sourceR;epinizer::Engine reference;reference.prepare(48000);reference.snap(s);reference.process(fullL.data(),fullR.data(),size,s);
+        double fullSide=0;for(int i=0;i<size;++i){const double side=fullL[size_t(i)]-fullR[size_t(i)];fullSide+=side*side;}
+        check(fullSide>1.e-5,"width reference has a stereo image");
+        for(float width:{0.f,.37f,1.f}) {
+            epinizer::Engine narrowed;narrowed.prepare(48000);s.width=width;narrowed.snap(s);auto l=sourceL,r=sourceR;narrowed.process(l.data(),r.data(),size,s);
+            for(int i=0;i<size;++i) {
+                const size_t n=size_t(i);const float mid=(fullL[n]+fullR[n])*.5f;
+                check(std::abs(l[n]-(mid+width*(fullL[n]-mid)))<1.e-6f,"width changes wet side and preserves its centre");
+                check(std::abs(r[n]-(mid+width*(fullR[n]-mid)))<1.e-6f,"width is linked across stereo channels");
+            }
+            for(bool bypass:{false,true}) {
+                s.mix=bypass?.6f:0.f;s.bypass=bypass;narrowed.prepare(48000);narrowed.snap(s);l=sourceL;r=sourceR;narrowed.process(l.data(),r.data(),size,s);
+                check(l==sourceL&&r==sourceR,"width leaves dry / bypass stereo untouched");
+            }
+            s.mix=1;s.bypass=false;
+        }
+    }
     for(double sr:{8000.,44100.,48000.,96000.,192000.})for(int character=0;character<4;++character){
         epinizer::Engine e;e.prepare(sr);epinizer::Settings s{1,1,1,1,character,false};e.snap(s);
         const int length=int(sr*15);std::vector<float> l(size_t(length),0),r(size_t(length),0);l[0]=r[0]=.9f;

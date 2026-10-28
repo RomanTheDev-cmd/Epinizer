@@ -16,4 +16,7 @@ Copy-Item 'build-windows/Release/epinizer_dsp_tests.exe','build-windows/Release/
 Copy-Item 'build-windows/epinizer_plugin_tests_artefacts/Release/epinizer_plugin_tests.exe' $validation -Force
 Copy-Item 'build-windows/epinizer_vst3_host_tests_artefacts/Release/epinizer_vst3_host_tests.exe' $validation -Force
 Copy-Item 'README.md','THIRD_PARTY.md','VALIDATION.md','CHANGELOG.md' $stage -Force
-Compress-Archive -Path $stage -DestinationPath 'dist/Epinizer-2.0.0-Windows-x64.zip' -Force
+Copy-Item 'План следующей версии.md' $stage -Force
+New-Item -ItemType Directory -Force (Join-Path $stage 'Assets') | Out-Null
+Copy-Item 'Assets/README.md' (Join-Path $stage 'Assets') -Force
+Compress-Archive -Path $stage -DestinationPath 'dist/Epinizer-2.1.0-Windows-x64.zip' -Force
