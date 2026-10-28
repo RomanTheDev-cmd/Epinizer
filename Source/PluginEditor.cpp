@@ -119,12 +119,10 @@ EpinizerEditor::EpinizerEditor(EpinizerProcessor& p):AudioProcessorEditor(p),own
     setLookAndFeel(&look);setSize(1000,640);setResizable(false,false);
     const char* ids[]{"space","density","motion","width","mix"};
     const char* labels[]{"Space","Density","Motion","Width","Mix"};
-    const char* tips[]{
-        "Space: atmosphere size, decay and bloom between notes.",
-        "Density: ensemble voices, body and character layers.",
-        "Motion: detune, drift and character movement.",
-        "Width: wet stereo width. 0% centres the effect; 100% keeps its full stereo image. Dry is unchanged.",
-        "Mix: original / processed balance. 0% is transparent; 100% is processed. Double-click any dial to reset."};
+    const juce::String tips[]{
+        {},{},{}, // the first three follow the character (updateCharacterTexts)
+        juce::String::fromUTF8("Ширина: стереокартина обработанного звука. 0 % — эффект по центру, 100 % — полная ширина. Исходный звук не меняется."),
+        juce::String::fromUTF8("Смесь исходного и обработанного звука: 0 % — без эффекта, 100 % — только обработанный. Двойной щелчок по ручке — сброс.")};
     const float defaults[]{.48f,.58f,.4f,1.f,.55f};
     for(size_t i=0;i<knobs.size();++i) {
         auto& k=knobs[i];k.setLookAndFeel(&look);k.setName(labels[i]);k.setTitle(labels[i]);
@@ -148,18 +146,45 @@ EpinizerEditor::EpinizerEditor(EpinizerProcessor& p):AudioProcessorEditor(p),own
     for(int i=0;i<p.getNumPrograms();++i)presets.addItem(p.getProgramName(i),i+1);
     presets.setSelectedId(p.getCurrentProgram()+1,juce::dontSendNotification);
     presets.setTitle("Factory preset");presets.setExplicitFocusOrder(1);
-    presets.setTooltip("Factory starting points. Your edits are saved in the DAW session.");
+    presets.setTooltip(juce::String::fromUTF8("Заводские отправные точки. Ваши правки сохраняются в проекте DAW."));
     presets.onChange=[this]{owner.setCurrentProgram(presets.getSelectedId()-1);};addAndMakeVisible(presets);
     addAndMakeVisible(bypass);bypass.setExplicitFocusOrder(13);
-    bypass.setTooltip("Bypass the effect and pass the original signal.");
+    bypass.setTooltip(juce::String::fromUTF8("Обход: пропустить исходный звук без обработки."));
     bypassAttachment=std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(p.state,"bypass",bypass);
     addAndMakeVisible(echo);echo.setExplicitFocusOrder(12);
-    echo.setTooltip("Character echo: short reflections, or darker repeats in Warm.");
+    echo.setTooltip(juce::String::fromUTF8("Echo: отчётливые повторы характера (у Warm — ленточные, у Horroble — смещающиеся по спирали). Атмосфера остаётся и без Echo."));
     echoAttachment=std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(p.state,"echo",echo);
     addAndMakeVisible(hold);hold.setExplicitFocusOrder(11);
-    hold.setTooltip("Hold the captured atmosphere. Captured audio is not saved in the DAW state.");
+    hold.setTooltip(juce::String::fromUTF8("Hold: удержать живую фактуру характера — она продолжает двигаться, новые ноты обрабатываются поверх, но не записываются в неё. Удержанный звук не сохраняется в проекте."));
     holdAttachment=std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(p.state,"hold",hold);
-    timerCallback();startTimerHz(24);
+    timerCallback();updateCharacterTexts();startTimerHz(24);
+}
+namespace {
+// Epinizer 3: the first three dials are the character's own macros (same parameters, saved and automated as before).
+// [character][dial]: dial 0 = space, 1 = density, 2 = motion.
+const char* const macroNames[4][3]{{"BLOOM","PRISM","FLOW"},{"SCALE","WEIGHT","SURGE"},{"ABYSS","DREAD","SWARM"},{"TRAIL","GLOW","DRIFT"}};
+const char* const macroLines[4][3]{{"Bands open later","Overtones & chirp","Moving shimmer"},{"Wall & depth","Density & body","Waves of mass"},
+                                   {"Depth & darkness","Shift & reversal","Moving unrest"},{"Fading memory","Saturation & softness","Tape wander"}};
+const char* const macroTips[4][3]{
+    {"Bloom (раскрытие): насколько позже верхние полосы раскрываются после атаки и сколько светлой дымки вокруг.",
+     "Prism (грани): обертоны и дисперсия — верхи приходят раньше тела, звук становится стеклянным; без октав.",
+     "Flow (перелив): живое движение мерцающей дымки."},
+    {"Scale (масштаб): размах плотной стены отражений и глубина массы.",
+     "Weight (вес): насыщение низкой середины и длинное тело нот; саб не добавляется.",
+     "Surge (напор): волны массы после акцентов — стена нарастает, когда нота затихает."},
+    {"Abyss (бездна): глубина и затемнение спиральной диффузии, длина обратных нарастаний.",
+     "Dread (тревога): атональный сдвиг спектра в герцах, размытые атаки и их обратные нарастания.",
+     "Swarm (рой): движение провалов и резонансов, беспокойство."},
+    {"Trail (след): длина памяти — след темнеет, насыщается и растворяется в фактуру.",
+     "Glow (тепло): мягкое насыщение, смягчённые пики и верх, плотнее середина; без саба.",
+     "Drift (дрейф): плавание обработанного звука, как у старой ленты."}};
+}
+void EpinizerEditor::updateCharacterTexts() {
+    const auto c=size_t(juce::jlimit(0,3,selected));
+    for(size_t i=0;i<3;++i){
+        const juce::String name=juce::String(macroNames[c][i]).toLowerCase().substring(0,1).toUpperCase()+juce::String(macroNames[c][i]).toLowerCase().substring(1);
+        knobs[i].setTitle(name);knobs[i].setTooltip(juce::String::fromUTF8(macroTips[c][i])); // the name stays the parameter (Space, Density, Motion)
+    }
 }
 EpinizerEditor::~EpinizerEditor() {stopTimer();setLookAndFeel(nullptr);}
 void EpinizerEditor::timerCallback() {
@@ -167,6 +192,7 @@ void EpinizerEditor::timerCallback() {
     if(current!=selected) {
         selected=current;
         for(size_t i=0;i<characters.size();++i)characters[i].setToggleState(int(i)==selected,juce::dontSendNotification);
+        updateCharacterTexts();
         repaint();
     }
     presets.setSelectedId(owner.getCurrentProgram()+1,juce::dontSendNotification);
@@ -194,8 +220,8 @@ void EpinizerEditor::paint(juce::Graphics& g) {
                                          juce::Colours::transparentBlack,620,155,false));
     g.fillRect(0,164,560,108);
     const char* names[]{"GLASS","MASSIVE","HORROBLE","WARM"};
-    const char* moods[]{"Prism voices. Octave light.","Ensemble weight. Lower octave.",
-                         "Reverse fragments. Unstable overtones.","Tape echoes. Velvet voices."};
+    const char* moods[]{"Dispersion and light. A shimmering surface.","Density and pressure. A wall of mass.",
+                         "Reversed attacks. A shifted, unstable spectrum.","Saturation and drift. A fading warm memory."};
     const auto index=size_t(std::max(0,selected));
     text(g,names[index],{40,190,490,36},26.f,paper,true);
     text(g,moods[index],{42,232,480,24},14.f,secondary);
@@ -205,8 +231,8 @@ void EpinizerEditor::paint(juce::Graphics& g) {
     g.setGradientFill(juce::ColourGradient(juce::Colour(0xa6172518),32,286,
                                          juce::Colour(0xeb0d120d),32,530,false));
     g.fillRoundedRectangle(32,286,936,244,9.f);
-    const char* labels[]{"SPACE","DENSITY","MOTION","WIDTH","MIX"};
-    const char* descriptions[]{"Bloom & scale","Voices & body","Drift & texture","Stereo field","Original / effect"};
+    const char* labels[]{macroNames[index][0],macroNames[index][1],macroNames[index][2],"WIDTH","MIX"};
+    const char* descriptions[]{macroLines[index][0],macroLines[index][1],macroLines[index][2],"Stereo field","Original / effect"};
     for(int i=0;i<5;++i) {
         const int x=40+i*184;
         text(g,labels[i],{x,302,184,23},13.f,i==4?paper:green,true,juce::Justification::centred);
@@ -219,5 +245,5 @@ void EpinizerEditor::paint(juce::Graphics& g) {
         g.fillRect(72+i*6,573,3,9);
     }
     text(g,"ATMOSPHERE / "+juce::String(names[index]),{208,563,400,27},11.5f,secondary);
-    text(g,"2.1.0",{860,610,108,18},10.5f,secondary,false,juce::Justification::right);
+    text(g,"3.0.0",{860,610,108,18},10.5f,secondary,false,juce::Justification::right);
 }

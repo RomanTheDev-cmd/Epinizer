@@ -3,10 +3,12 @@
 namespace {
 struct Preset {const char* name; int character; float space,density,motion,mix;};
 constexpr Preset presets[]{
-    {"Glass / Prism ensemble",0,.48f,.58f,.40f,.55f}, {"Glass / Crystal choir",0,.75f,.80f,.62f,.67f},
-    {"Massive / Wide horizon",1,.50f,.66f,.42f,.58f}, {"Massive / Titan",1,.72f,.90f,.60f,.72f},
-    {"Horroble / Dark ritual",2,.55f,.65f,.65f,.65f}, {"Horroble / Unstable",2,.75f,.82f,.95f,.76f},
-    {"Warm / Golden hour",3,.30f,.48f,.28f,.50f}, {"Warm / Velvet ensemble",3,.56f,.72f,.47f,.62f}};
+    // Epinizer 3 (2026-10-28): space = Bloom / Scale / Abyss / Trail, density = Prism / Weight / Dread / Glow,
+    // motion = Flow / Surge / Swarm / Drift. Starting points for listening, not final.
+    {"Glass / Frost light",0,.35f,.55f,.35f,.60f}, {"Glass / Prism shimmer",0,.70f,.80f,.60f,.70f},
+    {"Massive / Pressure",1,.30f,.60f,.50f,.60f}, {"Massive / Monolith",1,.70f,.85f,.70f,.75f},
+    {"Horroble / Presence",2,.35f,.55f,.40f,.60f}, {"Horroble / Abyss",2,.80f,.80f,.70f,.75f},
+    {"Warm / Faded tape",3,.35f,.55f,.40f,.60f}, {"Warm / Velvet memory",3,.65f,.75f,.55f,.70f}};
 }
 juce::AudioProcessorValueTreeState::ParameterLayout EpinizerProcessor::layout() {
     juce::AudioProcessorValueTreeState::ParameterLayout p;
@@ -45,7 +47,7 @@ void EpinizerProcessor::setCurrentProgram(int i) {
     const char* ids[]{"space","density","motion","mix","character","echo","hold"};const float v[]{p.space,p.density,p.motion,p.mix,float(p.character),1.f,0.f};
     for(int k=0;k<7;++k){auto* param=state.getParameter(ids[k]);param->beginChangeGesture();param->setValueNotifyingHost(param->convertTo0to1(v[k]));param->endChangeGesture();}
 }
-void EpinizerProcessor::getStateInformation(juce::MemoryBlock& b) {auto tree=state.copyState();tree.setProperty("program",program.load(),nullptr);tree.setProperty("version",4,nullptr);if(auto xml=tree.createXml())copyXmlToBinary(*xml,b);}
+void EpinizerProcessor::getStateInformation(juce::MemoryBlock& b) {auto tree=state.copyState();tree.setProperty("program",program.load(),nullptr);tree.setProperty("version",5,nullptr);/* 5: Epinizer 3 sound; old projects open with it */if(auto xml=tree.createXml())copyXmlToBinary(*xml,b);}
 void EpinizerProcessor::setStateInformation(const void* d,int size) {
     if(auto xml=getXmlFromBinary(d,size))if(xml->hasTagName(state.state.getType())) {
         auto tree=juce::ValueTree::fromXml(*xml);

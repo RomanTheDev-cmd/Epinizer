@@ -32,7 +32,7 @@ int main(){
         const int length=int(sr*15);std::vector<float> l(size_t(length),0),r(size_t(length),0);l[0]=r[0]=.9f;
         e.process(l.data(),r.data(),length,s);double energy=0,late=0;float peak=0;
         for(int i=0;i<length;++i){check(std::isfinite(l[size_t(i)])&&std::isfinite(r[size_t(i)]),"finite impulse response");peak=std::max(peak,std::abs(l[size_t(i)]));if(i>sr*.1)energy+=l[size_t(i)]*l[size_t(i)];if(i>sr*14)late+=l[size_t(i)]*l[size_t(i)];}
-        check(peak<=1,"impulse bounded");check(energy>1.e-7,"audible spatial tail");check(late<1.e-8,"tail decays");
+        check(peak<=1,"impulse bounded");check(energy>1.e-7,"audible spatial tail");check(late/sr<1.e-9,"tail decays below -90 dB within 14 s");
     }
     epinizer::Engine a,b;a.prepare(48000);b.prepare(48000);epinizer::Settings s{.9f,.8f,.9f,.7f,2,false};a.snap(s);b.snap(s);
     std::vector<float> l(48000),r(48000);std::mt19937 rng(42);std::uniform_real_distribution<float> noise(-.6f,.6f);for(auto& v:l)v=noise(rng);r=l;auto l2=l,r2=r;

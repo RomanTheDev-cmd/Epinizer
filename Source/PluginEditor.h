@@ -22,6 +22,7 @@ public:
     void resized() override;
 private:
     void timerCallback() override;
+    void updateCharacterTexts();
     EpinizerProcessor& owner;
     EpinizerLook look;
     juce::Image castle;

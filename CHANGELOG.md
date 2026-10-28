@@ -1,3 +1,20 @@
+# Epinizer 3.0.0 — 2026-10-28 (Claude)
+
+- New sound: each character is its own chain of effects (Roman: change the atmosphere of the sound itself; no room
+  reverb, sub, octaves or doubled notes). Glass: odd overtones, dispersion, bands that open after the attack, moving
+  haze. Massive: low-middle saturation, longer body, a dense wall of reflections that swells after accents, short deep
+  diffusion. Horroble: blurred attacks with reversed swells, atonal frequency shift, moving notches, spiralling
+  asymmetric diffusion. Warm: soft saturation, softer peaks and top, tape drift, a memory that dissolves into texture.
+- Removed: the six-voice ensemble, octave up/down layers and the shared 8-line room of 2.x.
+- Hold keeps the character's own moving texture at the captured energy (no 280 ms loop); new input plays on top.
+- Echo: distinct repeats per character; the character does not depend on it.
+- The wet level follows the dry level (slowly, only while sound comes in), so characters and Mix compare fairly.
+- Dials 1-3 are named per character (Bloom/Prism/Flow, Scale/Weight/Surge, Abyss/Dread/Swarm, Trail/Glow/Drift);
+  parameter IDs unchanged. Russian tooltips. New factory presets. State version 5; 2.x projects open with the new sound.
+- Tests: new character specification (76 checks: no sub/fifth/octave layers, no sub build-up, the material changes
+  with a short tail and Echo off, characters distinct, signatures, Hold without a short loop, comparable level, silence).
+  Generic tail test: below -90 dB within 14 s (was an absolute -127 dB bound).
+
 # Epinizer 2.1.0 — 2026-10-24 (Codex)
 
 - Refined controls: borderless buttons/values, thin dial arcs and soft dial shadows.

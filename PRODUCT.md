@@ -17,10 +17,11 @@ with monochrome controls, green gradients, gloomy abandoned castle entrance and
 abundant vegetation. Do not copy their artwork or edit either project.
 
 ## Functional boundaries
-This visual release exposes the existing Space/Density/Motion plus wet Width and Mix.
+Version 3.0 (2026-10-28): the sound is rebuilt as four separate chains (see README); the first three dials are
+the character's own macros on the same parameter IDs (space/density/motion), plus wet Width and Mix.
 Preserve factory presets, character selection, Echo/Hold/bypass, automation and saved state.
 No extra pages or ornamental controls. Width does not alter dry or create a second
-output on a mono bus. The sound remains based on v2; new sound concepts are a plan.
+output on a mono bus. The 2.x sound (ensemble, octave layers, shared room) is gone; acceptance is Roman's listening in a DAW.
 
 ## Evidence and limits
 Existing source, tests and local packages are available. Fresh validation and rendered
