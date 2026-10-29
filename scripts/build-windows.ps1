@@ -19,4 +19,4 @@ Copy-Item 'README.md','THIRD_PARTY.md','VALIDATION.md','CHANGELOG.md' $stage -Fo
 Copy-Item 'План следующей версии.md' $stage -Force
 New-Item -ItemType Directory -Force (Join-Path $stage 'Assets') | Out-Null
 Copy-Item 'Assets/README.md' (Join-Path $stage 'Assets') -Force
-Compress-Archive -Path $stage -DestinationPath 'dist/Epinizer-3.0.0-Windows-x64.zip' -Force
+Compress-Archive -Path $stage -DestinationPath 'dist/Epinizer-3.0.1-Windows-x64.zip' -Force

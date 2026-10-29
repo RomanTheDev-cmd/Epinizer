@@ -1,3 +1,11 @@
+# Epinizer 3.0.1 — 2026-10-29 (Claude)
+
+- Roman: Epinizer must be from MyDarknessDays as well. The AU still used the manufacturer code `Epna` and the bundle
+  ID `audio.epinizer.effect` of the old "Epinizer Audio" (and an old 1.0 copy with the same codes is in /Library), so
+  Logic grouped it apart from the series. Now `Mddy` / `Epnz` and `com.mydarknessdays.epinizer`, as PowerKick,
+  PowerBass, PowerSynth and PowerComp. For hosts this is a new plug-in: projects with Epinizer up to 3.0.0 need it
+  inserted again. The sound is unchanged from 3.0.0.
+
 # Epinizer 3.0.0 — 2026-10-28 (Claude)
 
 - New sound: each character is its own chain of effects (Roman: change the atmosphere of the sound itself; no room

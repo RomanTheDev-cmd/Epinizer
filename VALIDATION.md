@@ -23,7 +23,8 @@ were read only as references; no project files were changed or built there.
 - Actual native JUCE PNG at 2x visually inspected. Independent static finish review
   found no blocking overlap/clipping. This is not an interactive DAW GUI test.
 - Developer verified in AU Info.plist and VST3 moduleinfo as MyDarknessDays.
-  Existing Epna/Epnz and audio.epinizer.effect identifiers are retained.
+  Since 3.0.1 (2026-10-29): series identity Mddy/Epnz and com.mydarknessdays.epinizer (was Epna/Epnz,
+  audio.epinizer.effect of the old "Epinizer Audio"); auval lists it as `aufx Epnz Mddy - MyDarknessDays: Epinizer`.
 - User AU installed with the previous user bundle backed up. Installed executable
   SHA-256 is checked against the signed package, not the bare iCloud build folder. No PowerKick/PowerBass installation changed.
 - Apple auval strict passed arm64 and Rosetta **for version 2.1.0**, vendor

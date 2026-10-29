@@ -245,5 +245,5 @@ void EpinizerEditor::paint(juce::Graphics& g) {
         g.fillRect(72+i*6,573,3,9);
     }
     text(g,"ATMOSPHERE / "+juce::String(names[index]),{208,563,400,27},11.5f,secondary);
-    text(g,"3.0.0",{860,610,108,18},10.5f,secondary,false,juce::Justification::right);
+    text(g,"3.0.1",{860,610,108,18},10.5f,secondary,false,juce::Justification::right);
 }

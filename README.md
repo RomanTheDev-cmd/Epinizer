@@ -38,10 +38,15 @@ C++17 и JUCE 8.0.12.
 Предыдущий пользовательский AU сохраняется в
 `~/Library/Application Support/Epinizer/Backups`.
 
-Перезапустите DAW. В Logic: эффекты → **MyDarknessDays → Epinizer**.
-Если также виден старый системный Epinizer Audio, выбирайте MyDarknessDays.
-Начните с **Glass / Prism ensemble**, затем попробуйте **Massive / Titan**
-и **Horroble / Dark ritual**. Для обработки в send-шине поставьте Mix 100%.
+Перезапустите DAW. В Logic: эффекты → **MyDarknessDays → Epinizer** (рядом с PowerComp).
+
+С версии 3.0.1 Epinizer имеет идентичность серии MyDarknessDays: код разработчика `Mddy`,
+идентификатор `com.mydarknessdays.epinizer` (прежде `Epna` и `audio.epinizer.effect` от старого
+«Epinizer Audio»). Для DAW это новый плагин: в проектах, где стоял Epinizer 1.x–3.0.0, его нужно
+поставить заново. Старая системная копия 1.0 «Epinizer Audio» в `/Library/Audio/Plug-Ins/Components`
+больше не нужна — её можно переместить в Корзину (нужен пароль администратора).
+Начните с **Glass / Frost light**, затем попробуйте **Massive / Pressure**
+и **Horroble / Presence**. Для обработки в send-шине поставьте Mix 100%.
 Universal AU содержит arm64 и x86_64, минимальная macOS 11.0.
 
 Подпись AU локальная ad-hoc. Developer ID, нотариализация и подпись установщика

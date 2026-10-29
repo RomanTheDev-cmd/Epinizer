@@ -7,7 +7,7 @@ import tempfile
 import zipfile
 root = Path(__file__).resolve().parent.parent
 build = root / 'build-windows-design'
-out = root / 'dist' / 'Epinizer-3.0.0-Windows-x64.zip'
+out = root / 'dist' / 'Epinizer-3.0.1-Windows-x64.zip'
 plugin = build / 'Epinizer_artefacts/Release/VST3/Epinizer.vst3'
 if not plugin.is_dir():
     raise SystemExit('Build the Windows VST3 first')
